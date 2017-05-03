@@ -2,7 +2,8 @@ Simple cron-based tool to test health of web applications.
 
 ## Installing a new application to test
 
-### 1. Create a subdirectory in the services directory
+### 1. Create a new subdirectory in the services directory and a config.json file inside
+Your directory tree should look like this:
 ```tree
 web_monitoring
 +--check_webservice.py
@@ -11,6 +12,7 @@ web_monitoring
       +--config.json
 ```
 ### 2. Edit the config.json file in this directory
+The file config.json should look like this:
 ```json
 {
 	"alert": {
@@ -36,10 +38,10 @@ web_monitoring
 }
 ```
 `is_alive` and `thorough` are examples of checks that can be called in turn by `check_webservice.py`, you can configure as many services and as many checks per service.
-### 3. Edit the config.json file
-Details omitted
-### 4. Test your configuration
+
+### 3. Test your configuration
 `web_monitoring/check_webservice.py --service example --check is_alive`
-### 5. Install a new cron tab
-`crontab -e`  
+If your configuration valid and your service is up, you should receive an email.
+### 4. Install a new cron tab
+`$ crontab -e`  
 `*    * * * *   	~/web_monitoring/check_webservice.py --service example --check is_alive`

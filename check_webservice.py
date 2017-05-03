@@ -1,11 +1,14 @@
 #!/usr/bin/python
 
-import sys
+""" Check health of a configured web service """
+
+
+import os
 import argparse
 import os.path as osp
 import json
-import requests
 import smtplib
+import requests
 
 #################
 # health checks #
@@ -13,19 +16,22 @@ import smtplib
 
 
 def get_state_file(service, check):
+    """ Return the relevant path for service and check """
     return osp.join(osp.dirname(__file__), "services", service, check)
 
 
 def get_old_state(state_file):
+    """ Fetch last state as recorded on the local filesystem """
     return osp.isfile(state_file)
 
 
 def get_new_state(urls, verbose=False):
+    """ Check all the urls and return True iff all urls are healthy """
     global VERBOSE
     state_ok = True
     for url in urls:
         if VERBOSE:
-            print("checking url: {}".format(url))
+            print "checking url: {}".format(url)
         state_ok = state_ok and check_url(url)
         if not state_ok:
             return False
@@ -33,14 +39,18 @@ def get_new_state(urls, verbose=False):
 
 
 def check_url(url):
-    res = requests.get(url)
-    return res.status_code == 200
-
+    """ Check if url responds to get request with 200 status code """
+    try:
+        res = requests.get(url)
+        return res.status_code == 200
+    except:
+        return False
 
 def update_state(state_file, is_ok):
-    assert type(is_ok) == bool
+    """ Update the state as a record on the local filesystem """
+    assert isinstance(is_ok) == bool
     if is_ok:
-        open(state_file, 'a').close() # touch
+        open(state_file, 'a').close()  # touch
     else:
         os.remove(state_file)
 
@@ -49,13 +59,15 @@ def update_state(state_file, is_ok):
 # misc #
 ########
 
-parser = argparse.ArgumentParser(description="Check web services and alert whenever down or back up.")
+desc = "Check web services and alert whenever down or back up."
+parser = argparse.ArgumentParser(description=desc)
 parser.add_argument("--service", required=True)
 parser.add_argument("--check", required=True)
 parser.add_argument("--verbose", "-v", required=False, action="store_true")
 
 
 def notify(j_config, check, is_ok):
+    """ Send notification to registered email address """
     message = j_config["checks"][check]["state_ok_message" if is_ok else "state_problem_message"]
     sender = j_config["alert"]["sender"]
     receivers = j_config["alert"]["receivers"]
@@ -79,8 +91,7 @@ if __name__ == "__main__":
     config_path = osp.join(osp.dirname(__file__), "services", SERVICE, "config.json")
     with open(config_path) as config_file:
         j_config = json.loads(config_file.read())
-    check = j_config["checks"].get(CHECK)
-    if check is None:
+    if j_config["checks"].get(CHECK) is None:
         raise Exception("No check named {} for service {}".format(CHECK, SERVICE))
     state_file = get_state_file(SERVICE, CHECK)
     was_ok = get_old_state(state_file)
