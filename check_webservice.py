@@ -71,7 +71,10 @@ def notify(j_config, check, is_ok):
     message = j_config["checks"][check]["state_ok_message" if is_ok else "state_problem_message"]
     sender = j_config["alert"]["sender"]
     receivers = j_config["alert"]["receivers"]
-    smtp_conn = smtplib.SMTP("smtp.gmail.com", 587)
+    PORT = sender.get("port")
+    if  is None:
+        PORT = 587
+    smtp_conn = smtplib.SMTP(sender["server"], PORT)
     smtp_conn.starttls()
     smtp_conn.login(sender["login"], sender["password"])
     smtp_conn.sendmail(sender["address"], receivers, message)

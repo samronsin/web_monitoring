@@ -17,9 +17,11 @@ The file config.json should look like this:
 {
 	"alert": {
 		"sender": {
-			"address": "example@gmail.com",
+			"address": "example@example.com",
 			"login": "example",
-			"password": "xxxxxxxxx"
+			"password": "xxxxxxxxx",
+      "server": "smtp.example.com",
+      "port": 587
 		},
 		"receivers": ["target@example.com"]
 	},
