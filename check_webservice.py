@@ -48,7 +48,7 @@ def check_url(url):
 
 def update_state(state_file, is_ok):
     """ Update the state as a record on the local filesystem """
-    assert isinstance(is_ok) == bool
+    assert isinstance(is_ok, bool)
     if is_ok:
         open(state_file, 'a').close()  # touch
     else:
