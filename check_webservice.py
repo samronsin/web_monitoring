@@ -72,7 +72,7 @@ def notify(j_config, check, is_ok):
     sender = j_config["alert"]["sender"]
     receivers = j_config["alert"]["receivers"]
     PORT = sender.get("port")
-    if  is None:
+    if PORT is None:
         PORT = 587
     smtp_conn = smtplib.SMTP(sender["server"], PORT)
     smtp_conn.starttls()
